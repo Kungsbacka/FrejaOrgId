@@ -38,19 +38,19 @@ namespace FrejaOrgId
         }
 
         public async Task<InitAddResponse> InitAddAsync(InitAddRequest request) => 
-            await StandardRequest<InitAddResponse, InitAddRequest>(request);
+            await SendRequestAsync<InitAddResponse, InitAddRequest>(request);
 
         public async Task<GetAllResponse> GetAllAsync(GetAllRequest request) =>
-            await StandardRequest<GetAllResponse, GetAllRequest>(request);
+            await SendRequestAsync<GetAllResponse, GetAllRequest>(request);
 
         public async Task<CancelAddResponse> CancelAddAsync(CancelAddRequest request) =>
-            await StandardRequest<CancelAddResponse, CancelAddRequest>(request);
+            await SendRequestAsync<CancelAddResponse, CancelAddRequest>(request);
 
         public async Task<UpdateResponse> UpdateAsync(UpdateRequest request) =>
-            await StandardRequest<UpdateResponse, UpdateRequest>(request);
+            await SendRequestAsync<UpdateResponse, UpdateRequest>(request);
 
         public async Task<DeleteResponse> DeleteAsync(DeleteRequest request) =>
-            await StandardRequest<DeleteResponse, DeleteRequest>(request);
+            await SendRequestAsync<DeleteResponse, DeleteRequest>(request);
 
         public async Task<GetOneResponse> GetOneAsync(GetOneRequest request)
         {
@@ -85,7 +85,7 @@ namespace FrejaOrgId
             }
         }
 
-        private async Task<TResponse> StandardRequest<TResponse, TRequest>(TRequest request)
+        private async Task<TResponse> SendRequestAsync<TResponse, TRequest>(TRequest request)
         {
             IApiService apiService = _serviceProvider.GetRequiredService<IApiService>();
             return await apiService.SendRequestAsync<TResponse, TRequest>(request);
