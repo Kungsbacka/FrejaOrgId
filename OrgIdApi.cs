@@ -23,7 +23,7 @@ namespace FrejaOrgId
         public OrgIdApi(Environment environment, X509Certificate2 apiCertificate, X509Certificate2 jwtSigningCertificate)
         {
             ServiceCollection services = new();
-            services.AddHttpClient<IApiService>(client =>
+            services.AddHttpClient<IApiService>(ApiService.HttpClientName, client =>
             {
                 client.BaseAddress = _endpoints[environment];
             })
@@ -37,22 +37,22 @@ namespace FrejaOrgId
             _jwtSigningKey = new RsaSecurityKey(jwtSigningCertificate.GetRSAPublicKey());
         }
 
-        public async Task<InitAddResponse> InitAdd(InitAddRequest request) => 
+        public async Task<InitAddResponse> InitAddAsync(InitAddRequest request) => 
             await StandardRequest<InitAddResponse, InitAddRequest>(request);
 
-        public async Task<GetAllResponse> GetAll(GetAllRequest request) =>
+        public async Task<GetAllResponse> GetAllAsync(GetAllRequest request) =>
             await StandardRequest<GetAllResponse, GetAllRequest>(request);
 
-        public async Task<CancelAddResponse> CancelAdd(CancelAddRequest request) =>
+        public async Task<CancelAddResponse> CancelAddAsync(CancelAddRequest request) =>
             await StandardRequest<CancelAddResponse, CancelAddRequest>(request);
 
-        public async Task<UpdateResponse> Update(UpdateRequest request) =>
+        public async Task<UpdateResponse> UpdateAsync(UpdateRequest request) =>
             await StandardRequest<UpdateResponse, UpdateRequest>(request);
 
-        public async Task<DeleteResponse> Delete(DeleteRequest request) =>
+        public async Task<DeleteResponse> DeleteAsync(DeleteRequest request) =>
             await StandardRequest<DeleteResponse, DeleteRequest>(request);
 
-        public async Task<GetOneResponse> GetOne(GetOneRequest request)
+        public async Task<GetOneResponse> GetOneAsync(GetOneRequest request)
         {
             IApiService apiService = _serviceProvider.GetRequiredService<IApiService>();
             GetOneResponse response = await apiService.SendRequestAsync<GetOneResponse, GetOneRequest>(request);

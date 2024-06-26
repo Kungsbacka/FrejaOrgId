@@ -23,7 +23,7 @@ namespace FrejaOrgId.Model
                     throw new InvalidOperationException("If UserInfoType is 'SSN' UserInfo must be a SsnUserInfo object");
                 }
             }
-            else if (UserInfoType == UserInfoType.Inferred)
+            else if (userInfoType == UserInfoType.Inferred)
             {
                 if (userInfo is StringUserInfo stringUserInfo)
                 {

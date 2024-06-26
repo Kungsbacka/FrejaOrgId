@@ -18,6 +18,7 @@ namespace FrejaOrgId.Converters
     internal class GetOneDetailsConverter : JsonConverter<GetOneDetailsBase>
     {
         private const char Dot = '.';
+        private const byte Padding = 61;
         private const byte Plus = 43;
         private const byte Minus = 45;
         private const byte Underscore = 95;
@@ -92,10 +93,15 @@ namespace FrejaOrgId.Converters
                 throw new JsonException();
             }
             var payload = jwsReadOnlySpan.Slice(firstDot + 1, length);
-            Span<byte> payloadSpan = stackalloc byte[payload.Length];
+            int padding = (4 - (payload.Length % 4)) % 4;
+            Span<byte> payloadSpan = stackalloc byte[payload.Length + padding];
             Encoding.UTF8.GetBytes(payload, payloadSpan);
-            payloadSpan.Replace(Plus, Minus);
-            payloadSpan.Replace(ForwardSlash, Underscore);
+            for (int i = 0; i < padding; i++)
+            {
+                payloadSpan[payload.Length + i] = Padding;
+            }
+            payloadSpan.Replace(Minus, Plus);
+            payloadSpan.Replace(Underscore, ForwardSlash);
             Base64.DecodeFromUtf8InPlace(payloadSpan, out int bytesWritten);
             ApprovedGetOneDetails? approvedDetails = JsonSerializer.Deserialize<ApprovedGetOneDetails>(payloadSpan[..bytesWritten], options);
             return approvedDetails ?? throw new JsonException();

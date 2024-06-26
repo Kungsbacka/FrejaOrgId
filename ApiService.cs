@@ -5,6 +5,8 @@ namespace FrejaOrgId
 {
     internal class ApiService : IApiService
     {
+        public const string HttpClientName = "ApiService";
+        
         private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -23,7 +25,8 @@ namespace FrejaOrgId
             ArgumentNullException.ThrowIfNull(request, nameof(request));
             ApiAction apiAction = ApiAction.Get<TRequest>();
             using StringContent? content = BuildBase64EncodedContent(request, apiAction.Name);
-            using HttpResponseMessage? responseMessage = await _httpClientFactory.CreateClient().PostAsync(apiAction.Path, content);
+            using HttpResponseMessage? responseMessage =
+                await _httpClientFactory.CreateClient(HttpClientName).PostAsync(apiAction.Path, content);
             using Stream contentStream = await responseMessage.Content.ReadAsStreamAsync();
             if (responseMessage.IsSuccessStatusCode)
             {
