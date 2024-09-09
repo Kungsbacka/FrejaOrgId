@@ -10,13 +10,13 @@ namespace FrejaOrgId.Model
     );
 
     public record UserInfo(
-        UserOrganizationId OrganisationId,
+        UserOrganisationId OrganisationId,
         UserSsn Ssn,
         [property: JsonConverter(typeof(UpperCaseEnumConverter<UserRegistrationState>))]
         UserRegistrationState RegistrationState);
 
 
-    public record UserOrganizationId(string Title, string IdentifierName, string Identifier);
+    public record UserOrganisationId(string Title, string IdentifierName, string Identifier);
 
     public record UserSsn(string Ssn, string Country);
 
