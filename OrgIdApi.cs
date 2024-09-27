@@ -20,24 +20,62 @@ namespace FrejaOrgId
         private readonly RsaSecurityKey _jwtSigningKey;
         private bool _disposedValue;
 
-        public OrgIdApi(Environment environment, X509Certificate2 apiCertificate, X509Certificate2 jwtSigningCertificate)
+        public OrgIdApi(Environment environment, X509Certificate2 apiCertificate, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck = false) :
+            this(environment, apiCertificate, apiCertificateStore: null, apiCertificateThumbprint: null, jwtSigningCertificate, skipCertificateCheck)
+        { }
+
+        public OrgIdApi(Environment environment, StoreLocation apiCertificateStore, string apiCertificateThumbprint, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck = false) :
+                        this(environment, apiCertificate: null, apiCertificateStore, apiCertificateThumbprint, jwtSigningCertificate, skipCertificateCheck)
+
+        { }
+
+        private static X509Certificate2 GetCertificateFromStore(StoreLocation storeLocation, string thumbprint)
         {
+            X509Store store = new(storeLocation);
+            store.Open(OpenFlags.ReadOnly);
+            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+            if (certs.Count == 0)
+            {
+                throw new InvalidOperationException($"Cannot find a certificate with thumbprint {thumbprint}.");
+            }
+            return certs[0];
+        }
+
+        private OrgIdApi(Environment environment, X509Certificate2? apiCertificate, StoreLocation? apiCertificateStore, string? apiCertificateThumbprint, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck)
+        {
+            if (apiCertificate is null)
+            {
+                ArgumentNullException.ThrowIfNull(apiCertificateStore, nameof(apiCertificateStore));
+                ArgumentNullException.ThrowIfNullOrEmpty(apiCertificateThumbprint, nameof(apiCertificateThumbprint));
+                apiCertificate = GetCertificateFromStore(apiCertificateStore.Value, apiCertificateThumbprint);
+            }
+            
             ServiceCollection services = new();
+
+            SocketsHttpHandler handler = new()
+            {
+                SslOptions =
+                {
+                    ClientCertificates = [ apiCertificate ],  
+                }
+            };
+
+            if (skipCertificateCheck)
+            {
+                handler.SslOptions.RemoteCertificateValidationCallback = (message, cert, chain, errors) => true;
+            }
+
             services.AddHttpClient<IApiService>(ApiService.HttpClientName, client =>
             {
                 client.BaseAddress = _endpoints[environment];
             })
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                ClientCertificateOptions = ClientCertificateOption.Manual,
-                ClientCertificates = { apiCertificate },
-            });
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
             services.AddSingleton<IApiService, ApiService>();
             _serviceProvider = services.BuildServiceProvider();
             _jwtSigningKey = new RsaSecurityKey(jwtSigningCertificate.GetRSAPublicKey());
         }
 
-        public async Task<InitAddResponse> InitAddAsync(InitAddRequest request) => 
+        public async Task<InitAddResponse> InitAddAsync(InitAddRequest request) =>
             await SendRequestAsync<InitAddResponse, InitAddRequest>(request);
 
         public async Task<GetAllResponse> GetAllAsync(GetAllRequest request) =>
@@ -81,7 +119,10 @@ namespace FrejaOrgId
             TokenValidationResult validationResult = await tokenHandler.ValidateTokenAsync(jwt, validationParameters);
             if (!validationResult.IsValid)
             {
-                throw new Exception("JWS signature is invalid");
+                throw new Exception("JWS signature is invalid")
+                {
+                    Data = { ["TokenValidationResult"] = validationResult }
+                };
             }
         }
 
