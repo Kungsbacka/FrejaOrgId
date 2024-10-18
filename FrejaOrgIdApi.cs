@@ -6,57 +6,32 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace FrejaOrgId
 {
-    public class OrgIdApi : IDisposable
-    {
-        public enum Environment { Test, Production }
+    public enum FrejaEnvironment { Test, Production }
 
-        private static readonly Dictionary<Environment, Uri> _endpoints = new()
+    public class FrejaOrgIdApi : IDisposable, IFrejaOrgIdApi
+    {
+        private static readonly Dictionary<FrejaEnvironment, Uri> _endpoints = new()
         {
-            { Environment.Test, new Uri("https://services.test.frejaeid.com/organisation/management/orgId/1.0/") },
-            { Environment.Production, new Uri("https://services.prod.frejaeid.com/organisation/management/orgId/1.0/") }
+            { FrejaEnvironment.Test, new Uri("https://services.test.frejaeid.com/organisation/management/orgId/1.0/") },
+            { FrejaEnvironment.Production, new Uri("https://services.prod.frejaeid.com/organisation/management/orgId/1.0/") }
         };
 
         private readonly ServiceProvider _serviceProvider;
         private readonly RsaSecurityKey _jwtSigningKey;
         private bool _disposedValue;
 
-        public OrgIdApi(Environment environment, X509Certificate2 apiCertificate, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck = false) :
-            this(environment, apiCertificate, apiCertificateStore: null, apiCertificateThumbprint: null, jwtSigningCertificate, skipCertificateCheck)
-        { }
-
-        public OrgIdApi(Environment environment, StoreLocation apiCertificateStore, string apiCertificateThumbprint, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck = false) :
-                        this(environment, apiCertificate: null, apiCertificateStore, apiCertificateThumbprint, jwtSigningCertificate, skipCertificateCheck)
-
-        { }
-
-        private static X509Certificate2 GetCertificateFromStore(StoreLocation storeLocation, string thumbprint)
+        internal FrejaOrgIdApi(FrejaEnvironment environment, X509Certificate2? apiCertificate, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck)
         {
-            X509Store store = new(storeLocation);
-            store.Open(OpenFlags.ReadOnly);
-            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-            if (certs.Count == 0)
-            {
-                throw new InvalidOperationException($"Cannot find a certificate with thumbprint {thumbprint}.");
-            }
-            return certs[0];
-        }
+            ArgumentNullException.ThrowIfNull(apiCertificate, nameof(apiCertificate));
+            ArgumentNullException.ThrowIfNull(jwtSigningCertificate, nameof(jwtSigningCertificate));
 
-        private OrgIdApi(Environment environment, X509Certificate2? apiCertificate, StoreLocation? apiCertificateStore, string? apiCertificateThumbprint, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck)
-        {
-            if (apiCertificate is null)
-            {
-                ArgumentNullException.ThrowIfNull(apiCertificateStore, nameof(apiCertificateStore));
-                ArgumentNullException.ThrowIfNullOrEmpty(apiCertificateThumbprint, nameof(apiCertificateThumbprint));
-                apiCertificate = GetCertificateFromStore(apiCertificateStore.Value, apiCertificateThumbprint);
-            }
-            
             ServiceCollection services = new();
 
             SocketsHttpHandler handler = new()
             {
                 SslOptions =
                 {
-                    ClientCertificates = [ apiCertificate ],  
+                    ClientCertificates = [ apiCertificate ],
                 }
             };
 
