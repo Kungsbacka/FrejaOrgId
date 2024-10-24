@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace FrejaOrgId
 {
     internal class ApiService : IApiService
     {
-        public const string HttpClientName = "ApiService";
+        public const string HttpClientName = "FrejaOrgIdApiService";
         
         private static readonly JsonSerializerOptions _serializerOptions = new()
         {
@@ -33,8 +34,9 @@ namespace FrejaOrgId
                 return await JsonSerializer.DeserializeAsync<TResponse>(contentStream, _serializerOptions)
                     ?? throw new JsonException("Failed to deserialize response");
             }
-            var error = await responseMessage.Content.ReadAsStringAsync();
-            throw new Exception(error);
+            var error = await responseMessage.Content.ReadFromJsonAsync<FrejaOrgIdApiError>()
+                ?? throw new FrejaOrgIdApiException();
+            throw new FrejaOrgIdApiException(error);
         }
         
         private static StringContent? BuildBase64EncodedContent<T>(T request, string? actionName)
