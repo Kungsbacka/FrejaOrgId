@@ -6,13 +6,13 @@ namespace FrejaOrgId.Model
     public record InitAddRequest
     {
         [JsonConverter(typeof(UpperCaseEnumConverter<UserInfoType>))]
-        public UserInfoType UserInfoType { get; }
+        public UserInfoType UserInfoType { get; init; }
         [JsonConverter(typeof(UserInfoBase64Converter))]
-        public UserInfoBase UserInfo { get; }
+        public UserInfoBase UserInfo { get; init; }
         [JsonConverter(typeof(UpperCaseEnumConverter<MinRegistrationLevel>))]
-        public MinRegistrationLevel? MinRegistrationLevel { get; }
-        public long? Expiry { get; }
-        public OrganisationId OrganisationId { get; }
+        public MinRegistrationLevel? MinRegistrationLevel { get; init; }
+        public long? Expiry { get; init; }
+        public OrganisationId OrganisationId { get; init; }
 
         public InitAddRequest(UserInfoType userInfoType, UserInfoBase userInfo, OrganisationId organisationId, MinRegistrationLevel? minRegistrationLevel, long? expiry)
         {
