@@ -25,7 +25,8 @@ namespace FrejaOrgId.Converters
         {
             if (typeToConvert.IsArray)
             {
-                Type? elementType = typeToConvert.GetElementType() ?? throw new JsonException("Unable to determine array element type");
+                Type? elementType = typeToConvert.GetElementType() ??
+                                    throw new JsonException("Unable to determine array element type");
                 ArrayList list = [];
                 while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
                 {
@@ -38,6 +39,7 @@ namespace FrejaOrgId.Converters
                         throw new JsonException("Invalid enum value in array");
                     }
                 }
+
                 Array array = Array.CreateInstance(typeToConvert, list.Count);
                 list.CopyTo(array);
                 return (T)Convert.ChangeType(array, typeof(T));
@@ -70,6 +72,7 @@ namespace FrejaOrgId.Converters
                     string stringValue = enumValue?.ToString() ?? throw new JsonException("Enum value cannot be null");
                     writer.WriteStringValue(stringValue.ToUpperInvariant());
                 }
+
                 writer.WriteEndArray();
             }
             else

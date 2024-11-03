@@ -7,43 +7,57 @@ namespace FrejaOrgId.Model
     {
         [JsonConverter(typeof(UpperCaseEnumConverter<UserInfoType>))]
         public UserInfoType UserInfoType { get; init; }
+
         [JsonConverter(typeof(UserInfoBase64Converter))]
         public UserInfoBase UserInfo { get; init; }
+
         [JsonConverter(typeof(UpperCaseEnumConverter<MinRegistrationLevel>))]
         public MinRegistrationLevel? MinRegistrationLevel { get; init; }
+
         public long? Expiry { get; init; }
         public OrganisationId OrganisationId { get; init; }
 
-        public InitAddRequest(UserInfoType userInfoType, UserInfoBase userInfo, OrganisationId organisationId, MinRegistrationLevel? minRegistrationLevel, long? expiry)
+        public InitAddRequest(UserInfoType userInfoType, UserInfoBase userInfo, OrganisationId organisationId,
+            MinRegistrationLevel? minRegistrationLevel, long? expiry)
         {
-            if (userInfoType == UserInfoType.Ssn)
+            switch (userInfoType)
             {
-                if (userInfo is not SsnUserInfo)
+                case UserInfoType.Ssn:
                 {
-                    throw new InvalidOperationException("If UserInfoType is 'SSN' UserInfo must be a SsnUserInfo object");
+                    if (userInfo is not SsnUserInfo)
+                    {
+                        throw new InvalidOperationException(
+                            "If UserInfoType is 'SSN' UserInfo must be a SsnUserInfo object");
+                    }
+
+                    break;
                 }
-            }
-            else if (userInfoType == UserInfoType.Inferred)
-            {
-                if (userInfo is StringUserInfo stringUserInfo)
+                case UserInfoType.Inferred when userInfo is StringUserInfo stringUserInfo:
                 {
                     if (stringUserInfo.Value != "N/A")
                     {
-                        throw new ArgumentException("If UserInfoType is 'Inferred' UserInfo value must be 'N/A'", nameof(userInfo));
+                        throw new ArgumentException("If UserInfoType is 'Inferred' UserInfo value must be 'N/A'",
+                            nameof(userInfo));
                     }
+
+                    break;
                 }
-                else
+                case UserInfoType.Inferred:
+                    throw new ArgumentException(
+                        "If UserInfoType is 'Inferred' UserInfo value must be of type StringUserInfo",
+                        nameof(userInfo));
+                default:
                 {
-                    throw new ArgumentException("If UserInfoType is 'Inferred' UserInfo value must be of type StringUserInfo", nameof(userInfo));
+                    if (userInfo is not StringUserInfo)
+                    {
+                        throw new InvalidOperationException(
+                            $"If UserInfoType is '{UserInfoType}' UserInfo must be a string");
+                    }
+
+                    break;
                 }
             }
-            else
-            {
-                if (userInfo is not StringUserInfo)
-                {
-                    throw new InvalidOperationException($"If UserInfoType is '{UserInfoType}' UserInfo must be a string");
-                }
-            }
+
             UserInfoType = userInfoType;
             UserInfo = userInfo;
             MinRegistrationLevel = minRegistrationLevel;
@@ -53,12 +67,18 @@ namespace FrejaOrgId.Model
     }
 
     public record InitAddResponse(string OrgIdRef);
-  
+
     public record OrganisationId(
-        string Title, string IdentifierName, string Identifier,
-        [property: JsonConverter(typeof(UpperCaseEnumConverter<IdentifierDisplayType[]>))] IdentifierDisplayType[]? IdentifierDisplayTypes,
+        string Title,
+        string IdentifierName,
+        string Identifier,
+        [property: JsonConverter(typeof(UpperCaseEnumConverter<IdentifierDisplayType[]>))]
+        IdentifierDisplayType[]? IdentifierDisplayTypes,
         AdditionalAttribute[]? AdditionalAttributes);
 
-    public enum IdentifierDisplayType { Text, QR_Code }
+    public enum IdentifierDisplayType
+    {
+        Text,
+        QR_Code
+    }
 }
-

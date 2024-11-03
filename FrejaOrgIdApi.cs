@@ -6,21 +6,29 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace FrejaOrgId
 {
-    public enum FrejaEnvironment { Test, Production }
-
-    public class FrejaOrgIdApi : IDisposable, IFrejaOrgIdApi
+    public enum FrejaEnvironment
     {
-        private static readonly Dictionary<FrejaEnvironment, Uri> _endpoints = new()
+        Test,
+        Production
+    }
+
+    public sealed class FrejaOrgIdApi : IDisposable, IFrejaOrgIdApi
+    {
+        private static readonly Dictionary<FrejaEnvironment, Uri> Endpoints = new()
         {
             { FrejaEnvironment.Test, new Uri("https://services.test.frejaeid.com/organisation/management/orgId/1.0/") },
-            { FrejaEnvironment.Production, new Uri("https://services.prod.frejaeid.com/organisation/management/orgId/1.0/") }
+            {
+                FrejaEnvironment.Production,
+                new Uri("https://services.prod.frejaeid.com/organisation/management/orgId/1.0/")
+            }
         };
 
         private readonly ServiceProvider _serviceProvider;
         private readonly RsaSecurityKey _jwtSigningKey;
         private bool _disposedValue;
 
-        internal FrejaOrgIdApi(FrejaEnvironment environment, X509Certificate2? apiCertificate, X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck)
+        internal FrejaOrgIdApi(FrejaEnvironment environment, X509Certificate2? apiCertificate,
+            X509Certificate2 jwtSigningCertificate, bool skipCertificateCheck)
         {
             ArgumentNullException.ThrowIfNull(apiCertificate, nameof(apiCertificate));
             ArgumentNullException.ThrowIfNull(jwtSigningCertificate, nameof(jwtSigningCertificate));
@@ -31,7 +39,7 @@ namespace FrejaOrgId
             {
                 SslOptions =
                 {
-                    ClientCertificates = [ apiCertificate ],
+                    ClientCertificates = [apiCertificate],
                 }
             };
 
@@ -40,11 +48,9 @@ namespace FrejaOrgId
                 handler.SslOptions.RemoteCertificateValidationCallback = (message, cert, chain, errors) => true;
             }
 
-            services.AddHttpClient<IApiService>(ApiService.HttpClientName, client =>
-            {
-                client.BaseAddress = _endpoints[environment];
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => handler);
+            services.AddHttpClient<IApiService>(ApiService.HttpClientName,
+                    client => { client.BaseAddress = Endpoints[environment]; })
+                .ConfigurePrimaryHttpMessageHandler(() => handler);
             services.AddSingleton<IApiService, ApiService>();
             _serviceProvider = services.BuildServiceProvider();
             _jwtSigningKey = new RsaSecurityKey(jwtSigningCertificate.GetRSAPublicKey());
@@ -76,8 +82,10 @@ namespace FrejaOrgId
                 {
                     throw new Exception("OriginalJws should not be null.");
                 }
+
                 await ThrowIfInvalidJwsSignatureAsync(details.OriginalJws);
             }
+
             return response;
         }
 
@@ -107,22 +115,20 @@ namespace FrejaOrgId
             return await apiService.SendRequestAsync<TResponse, TRequest>(request);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
-            if (!_disposedValue)
+            if (_disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    _serviceProvider?.Dispose();
-                }
-                _disposedValue = true;
+                _serviceProvider?.Dispose();
             }
+
+            _disposedValue = true;
         }
 
         public void Dispose()
         {
             Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

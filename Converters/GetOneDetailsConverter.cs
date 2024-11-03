@@ -23,7 +23,7 @@ namespace FrejaOrgId.Converters
         private const byte Minus = 45;
         private const byte Underscore = 95;
         private const byte ForwardSlash = 47;
-        private static readonly JsonWebTokenHandler _tokenHandler = new();
+        private static readonly JsonWebTokenHandler TokenHandler = new();
 
         /// <summary>
         /// Reads and converts the JSON to the specified type. If the JSON token is not a string, it throws a JsonException.
@@ -33,23 +33,27 @@ namespace FrejaOrgId.Converters
         /// <returns>
         /// A DetailsBase object which can be either an ApprovedDetails or StringDetails based on the input JSON string.
         /// </returns>
-        public override GetOneDetailsBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override GetOneDetailsBase? Read(ref Utf8JsonReader reader, Type typeToConvert,
+            JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.String)
             {
                 throw new JsonException("Expected a JSON string");
             }
+
             string? value = reader.GetString();
             if (value == null)
             {
                 return null;
             }
-            if (_tokenHandler.CanReadToken(value))
+
+            if (TokenHandler.CanReadToken(value))
             {
                 ApprovedGetOneDetails details = DeserializeJws(value, options);
                 details.SetOriginalJws(value);
                 return details;
             }
+
             return new StringGetOneDetails(value);
         }
 
@@ -92,6 +96,7 @@ namespace FrejaOrgId.Converters
             {
                 throw new JsonException();
             }
+
             var payload = jwsReadOnlySpan.Slice(firstDot + 1, length);
             int padding = (4 - (payload.Length % 4)) % 4;
             Span<byte> payloadSpan = stackalloc byte[payload.Length + padding];
@@ -100,10 +105,12 @@ namespace FrejaOrgId.Converters
             {
                 payloadSpan[payload.Length + i] = Padding;
             }
+
             payloadSpan.Replace(Minus, Plus);
             payloadSpan.Replace(Underscore, ForwardSlash);
             Base64.DecodeFromUtf8InPlace(payloadSpan, out int bytesWritten);
-            ApprovedGetOneDetails? approvedDetails = JsonSerializer.Deserialize<ApprovedGetOneDetails>(payloadSpan[..bytesWritten], options);
+            ApprovedGetOneDetails? approvedDetails =
+                JsonSerializer.Deserialize<ApprovedGetOneDetails>(payloadSpan[..bytesWritten], options);
             return approvedDetails ?? throw new JsonException();
         }
     }

@@ -27,22 +27,31 @@ namespace FrejaOrgId.Model
     public record ApprovedGetOneDetails : GetOneDetailsBase
     {
         public string OrgIdRef { get; init; }
+
         [JsonConverter(typeof(UpperCaseEnumConverter<TransactionStatus>))]
         public TransactionStatus Status { get; init; }
+
         [JsonConverter(typeof(UpperCaseEnumConverter<UserInfoType>))]
         public UserInfoType UserInfoType { get; init; }
+
         [JsonConverter(typeof(UserInfoJsonConverter))]
         public UserInfoBase UserInfo { get; init; }
+
         [JsonConverter(typeof(UpperCaseEnumConverter<MinRegistrationLevel>))]
         public MinRegistrationLevel MinRegistrationLevel { get; init; }
+
         [JsonConverter(typeof(UnixTimeConverter))]
         public DateTime Timestamp { get; init; }
+
         [JsonConverter(typeof(UpperCaseEnumConverter<SignatureType>))]
         public SignatureType SignatureType { get; init; }
+
         public SignatureData SignatureData { get; init; }
         public string? OriginalJws { get; private set; }
 
-        public ApprovedGetOneDetails(string orgIdRef, TransactionStatus status, UserInfoType userInfoType, UserInfoBase userInfo, MinRegistrationLevel minRegistrationLevel, DateTime timestamp, SignatureType signatureType, SignatureData signatureData)
+        public ApprovedGetOneDetails(string orgIdRef, TransactionStatus status, UserInfoType userInfoType,
+            UserInfoBase userInfo, MinRegistrationLevel minRegistrationLevel, DateTime timestamp,
+            SignatureType signatureType, SignatureData signatureData)
         {
             OrgIdRef = orgIdRef;
             Status = status;
@@ -60,6 +69,7 @@ namespace FrejaOrgId.Model
             {
                 throw new InvalidOperationException("OriginalJws already has a value.");
             }
+
             OriginalJws = jws;
         }
     }

@@ -27,16 +27,19 @@ namespace FrejaOrgId.Converters
             {
                 throw new JsonException("Expected a JSON string");
             }
+
             string? value = reader.GetString();
             if (value == null)
             {
                 return null;
             }
+
             if (Base64.IsValid(value))
             {
                 Span<byte> buffer = Convert.FromBase64String(value).AsSpan();
                 return JsonSerializer.Deserialize<SsnUserInfo>(buffer, options);
             }
+
             return new StringUserInfo(value);
         }
 

@@ -5,9 +5,7 @@ namespace FrejaOrgId.Model
 {
     public record GetAllRequest();
 
-    public record GetAllResponse(
-        UserInfo[] UserInfos
-    );
+    public record GetAllResponse(UserInfo[] UserInfos);
 
     public record UserInfo(
         UserOrganisationId OrganisationId,
@@ -20,5 +18,10 @@ namespace FrejaOrgId.Model
 
     public record UserSsn(string Ssn, string Country);
 
-    public enum UserRegistrationState { Extended, Vetting_confirmed, Plus }
+    public enum UserRegistrationState
+    {
+        Extended,
+        Vetting_confirmed,
+        Plus
+    }
 }

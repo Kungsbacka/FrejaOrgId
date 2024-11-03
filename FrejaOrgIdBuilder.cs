@@ -4,7 +4,7 @@ namespace FrejaOrgId
 {
     public class FrejaOrgIdApiBuilder
     {
-        private FrejaEnvironment _environment;
+        private readonly FrejaEnvironment _environment;
         private X509Certificate2? _apiCertificate;
         private X509Certificate2? _jwtSigningCertificate;
         private bool _skipCertificateCheck = false;
@@ -23,7 +23,7 @@ namespace FrejaOrgId
 
         public FrejaOrgIdApiBuilder WithApiCertificate(StoreLocation storeLocation, string thumbprint)
         {
-            ArgumentNullException.ThrowIfNullOrEmpty(thumbprint, nameof(thumbprint));
+            ArgumentException.ThrowIfNullOrEmpty(thumbprint, nameof(thumbprint));
             return WithApiCertificate(GetCertificateFromStore(storeLocation, thumbprint));
         }
 
@@ -36,7 +36,7 @@ namespace FrejaOrgId
 
         public FrejaOrgIdApiBuilder WithJwtSigningCertificate(StoreLocation storeLocation, string thumbprint)
         {
-            ArgumentNullException.ThrowIfNullOrEmpty(thumbprint, nameof(thumbprint));
+            ArgumentException.ThrowIfNullOrEmpty(thumbprint, nameof(thumbprint));
             return WithJwtSigningCertificate(GetCertificateFromStore(storeLocation, thumbprint));
         }
 
@@ -55,22 +55,25 @@ namespace FrejaOrgId
 
             if (_jwtSigningCertificate == null)
             {
-                throw new InvalidOperationException("JWT signing certificate must be configured. Use WithJwtSigningCertificate().");
+                throw new InvalidOperationException(
+                    "JWT signing certificate must be configured. Use WithJwtSigningCertificate().");
             }
 
             return new FrejaOrgIdApi(_environment, _apiCertificate, _jwtSigningCertificate, _skipCertificateCheck);
         }
+
         private static X509Certificate2 GetCertificateFromStore(StoreLocation storeLocation, string thumbprint)
         {
             X509Store store = new(storeLocation);
             store.Open(OpenFlags.ReadOnly);
-            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+            X509Certificate2Collection
+                certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
             if (certs.Count == 0)
             {
                 throw new InvalidOperationException($"Cannot find a certificate '{thumbprint}' in '{storeLocation}'.");
             }
+
             return certs[0];
         }
-
     }
 }

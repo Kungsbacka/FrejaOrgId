@@ -12,9 +12,9 @@
         {
         }
 
-        public FrejaOrgIdApiException(FrejaOrgIdApiError error) : base(error.Message)
+        public FrejaOrgIdApiException(FrejaOrgIdApiErrorResponse errorResponse) : base(errorResponse.Message)
         {
-            Code = error.Code;
+            Code = errorResponse.Code;
         }
     }
 }

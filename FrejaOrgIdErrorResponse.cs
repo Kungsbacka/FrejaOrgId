@@ -2,7 +2,7 @@
 
 namespace FrejaOrgId
 {
-    public record FrejaOrgIdApiError(int Code, string Message)
+    public record FrejaOrgIdApiErrorResponse(int Code, string Message)
     {
         public override string? ToString()
         {

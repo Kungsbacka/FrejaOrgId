@@ -29,15 +29,18 @@ namespace FrejaOrgId.Converters
             {
                 throw new JsonException("Expected a JSON string");
             }
+
             string? value = reader.GetString();
             if (value == null)
             {
                 return null;
             }
+
             if (IsJson(value))
             {
                 return JsonSerializer.Deserialize<SsnUserInfo>(value, options);
             }
+
             return new StringUserInfo(value);
         }
 
