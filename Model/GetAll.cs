@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using FrejaOrgId.Converters;
+﻿using FrejaOrgId.Converters;
+using System.Text.Json.Serialization;
 
 namespace FrejaOrgId.Model
 {

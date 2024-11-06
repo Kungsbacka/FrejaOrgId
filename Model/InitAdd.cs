@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using FrejaOrgId.Converters;
+﻿using FrejaOrgId.Converters;
+using System.Text.Json.Serialization;
 
 namespace FrejaOrgId.Model
 {
@@ -23,39 +23,39 @@ namespace FrejaOrgId.Model
             switch (userInfoType)
             {
                 case UserInfoType.Ssn:
-                {
-                    if (userInfo is not SsnUserInfo)
                     {
-                        throw new InvalidOperationException(
-                            "If UserInfoType is 'SSN' UserInfo must be a SsnUserInfo object");
-                    }
+                        if (userInfo is not SsnUserInfo)
+                        {
+                            throw new InvalidOperationException(
+                                "If UserInfoType is 'SSN' UserInfo must be a SsnUserInfo object");
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case UserInfoType.Inferred when userInfo is StringUserInfo stringUserInfo:
-                {
-                    if (stringUserInfo.Value != "N/A")
                     {
-                        throw new ArgumentException("If UserInfoType is 'Inferred' UserInfo value must be 'N/A'",
-                            nameof(userInfo));
-                    }
+                        if (stringUserInfo.Value != "N/A")
+                        {
+                            throw new ArgumentException("If UserInfoType is 'Inferred' UserInfo value must be 'N/A'",
+                                nameof(userInfo));
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case UserInfoType.Inferred:
                     throw new ArgumentException(
                         "If UserInfoType is 'Inferred' UserInfo value must be of type StringUserInfo",
                         nameof(userInfo));
                 default:
-                {
-                    if (userInfo is not StringUserInfo)
                     {
-                        throw new InvalidOperationException(
-                            $"If UserInfoType is '{UserInfoType}' UserInfo must be a string");
-                    }
+                        if (userInfo is not StringUserInfo)
+                        {
+                            throw new InvalidOperationException(
+                                $"If UserInfoType is '{UserInfoType}' UserInfo must be a string");
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             UserInfoType = userInfoType;

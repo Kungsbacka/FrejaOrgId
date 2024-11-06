@@ -1,8 +1,8 @@
-﻿using System.Buffers.Text;
+﻿using FrejaOrgId.Model;
+using System.Buffers.Text;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FrejaOrgId.Model;
 
 namespace FrejaOrgId.Converters
 {
