@@ -74,7 +74,7 @@ namespace FrejaOrgId.Converters
                     writer.WriteStringValue(stringDetails.Value);
                     break;
                 default:
-                    throw new JsonException("Expected an object that inherits from DetailsBase");
+                    throw new JsonException("Unexpeced type");
             }
         }
 
