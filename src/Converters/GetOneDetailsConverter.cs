@@ -1,4 +1,4 @@
-﻿using FrejaOrgId.Model;
+﻿using FrejaOrgId.Model.GetOne;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Buffers.Text;
 using System.Text;

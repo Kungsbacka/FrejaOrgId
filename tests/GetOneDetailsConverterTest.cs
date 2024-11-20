@@ -1,6 +1,8 @@
 using System.Text.Json;
 using FrejaOrgId.Converters;
 using FrejaOrgId.Model;
+using FrejaOrgId.Model.GetOne;
+using FrejaOrgId.Model.Shared;
 
 namespace FrejaOrgId.Tests;
 
@@ -82,8 +84,8 @@ public class GetOneDetailsConverterTests
              timestamp: DateTime.Parse("2020-01-01"),
              signatureType: SignatureType.Simple,
              signatureData: new SignatureData(
-                 UserSignature: "The signature produced by the end user", 
-                 CertificateStatus: "Evidence of end-users certificate status"
+                 userSignature: "The signature produced by the end user", 
+                 certificateStatus: "Evidence of end-users certificate status"
               )
         );
         value.SetOriginalJws("Original JWS");
@@ -110,4 +112,4 @@ public class GetOneDetailsConverterTests
     }
 }
 
-internal record UnknownGetOneDetails : GetOneDetailsBase { }
+internal class UnknownGetOneDetails : GetOneDetailsBase { }

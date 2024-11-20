@@ -2,8 +2,17 @@
 
 namespace FrejaOrgId
 {
-    public record FrejaOrgIdApiErrorResponse(int Code, string Message)
+    public class FrejaOrgIdApiErrorResponse
     {
+        public int Code { get; set; }
+        public string Message { get; set; }
+
+        internal FrejaOrgIdApiErrorResponse(int code, string message)
+        {
+            Code = code;
+            Message = message;
+        }
+
         public override string? ToString()
         {
             StringBuilder sb = new();

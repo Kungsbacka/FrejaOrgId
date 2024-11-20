@@ -2,6 +2,7 @@
 using System.Text.Json;
 using FrejaOrgId.Model;
 using FrejaOrgId.Converters;
+using FrejaOrgId.Model.Shared;
 
 namespace FrejaOrgId.Tests;
 
@@ -85,5 +86,5 @@ public class UserInfoBase64ConverterTests
         Assert.Throws<JsonException>(() => JsonSerializer.Serialize<UserInfoBase>(unsupportedType, _serializerOptions));
     }
 
-    private record UnsupportedUserInfo : UserInfoBase;
+    private class UnsupportedUserInfo : UserInfoBase;
 }

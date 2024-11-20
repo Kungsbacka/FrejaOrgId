@@ -1,4 +1,4 @@
-﻿using FrejaOrgId.Model;
+﻿using FrejaOrgId.Model.Shared;
 using System.Buffers.Text;
 using System.Text;
 using System.Text.Json;

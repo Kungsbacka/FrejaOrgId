@@ -1,4 +1,9 @@
-﻿using FrejaOrgId.Model;
+﻿using FrejaOrgId.Model.CancelAdd;
+using FrejaOrgId.Model.Delete;
+using FrejaOrgId.Model.GetAll;
+using FrejaOrgId.Model.GetOne;
+using FrejaOrgId.Model.InitAdd;
+using FrejaOrgId.Model.Update;
 
 namespace FrejaOrgId
 {
