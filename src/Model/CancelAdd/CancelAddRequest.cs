@@ -1,8 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace FrejaOrgId.Model.CancelAdd;
 
-namespace FrejaOrgId.Model.CancelAdd;
-
-public class CancelAddRequest
+public class CancelAddRequest : ICancelAddRequest
 {
     public string OrgIdRef { get; private set; }
 

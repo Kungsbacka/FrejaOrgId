@@ -1,12 +1,15 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 
-namespace FrejaOrgId
+namespace FrejaOrgId.Model.Error
 {
-    public class FrejaOrgIdApiErrorResponse
-    {
-        public int Code { get; set; }
-        public string Message { get; set; }
 
+    public class FrejaOrgIdApiErrorResponse : IFrejaOrgIdApiErrorResponse
+    {
+        public int Code { get; private set; }
+        public string Message { get; private set; }
+
+        [JsonConstructor]
         internal FrejaOrgIdApiErrorResponse(int code, string message)
         {
             Code = code;

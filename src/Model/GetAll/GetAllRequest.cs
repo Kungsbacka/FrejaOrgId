@@ -1,3 +1,5 @@
 ﻿namespace FrejaOrgId.Model.GetAll;
 
-public class GetAllRequest { }
+public class GetAllRequest : IGetAllRequest
+{
+}

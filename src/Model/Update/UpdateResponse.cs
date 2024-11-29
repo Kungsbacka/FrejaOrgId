@@ -2,7 +2,7 @@
 
 namespace FrejaOrgId.Model.Update;
 
-public class UpdateResponse
+public class UpdateResponse : IUpdateResponse
 {
     public UpdateStatus UpdateStatus { get; private set; }
 

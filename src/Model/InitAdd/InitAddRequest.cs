@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace FrejaOrgId.Model.InitAdd;
 
-public class InitAddRequest
+public class InitAddRequest : IInitAddRequest
 {
     [JsonConverter(typeof(UpperCaseEnumConverter<UserInfoType>))]
     public UserInfoType UserInfoType { get; private set; }
@@ -33,7 +33,10 @@ public class InitAddRequest
         {
             throw new ArgumentException("Expiration time must be between 2 and 43200 minutes (30 days).");
         }
-        Expiry = DateTimeOffset.Now.AddMinutes(expirationInMinutes).ToUnixTimeMilliseconds();
+        else
+        {
+            Expiry = DateTimeOffset.Now.AddMinutes(expirationInMinutes).ToUnixTimeMilliseconds();
+        }
 
         switch (userInfoType)
         {

@@ -1,6 +1,6 @@
 ﻿namespace FrejaOrgId.Model.GetOne;
 
-public class GetOneRequest
+public class GetOneRequest : IGetOneRequest
 {
     public string OrgIdRef { get; private set; }
 

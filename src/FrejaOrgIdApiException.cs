@@ -1,4 +1,6 @@
-﻿namespace FrejaOrgId
+﻿using FrejaOrgId.Model.Error;
+
+namespace FrejaOrgId
 {
     public class FrejaOrgIdApiException : Exception
     {

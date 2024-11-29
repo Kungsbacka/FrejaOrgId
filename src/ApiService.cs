@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using FrejaOrgId.Model.Error;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 
@@ -31,8 +32,8 @@ namespace FrejaOrgId
             await using Stream contentStream = await responseMessage.Content.ReadAsStreamAsync();
             if (responseMessage.IsSuccessStatusCode)
             {
-                return await JsonSerializer.DeserializeAsync<TResponse>(contentStream, SerializerOptions)
-                       ?? throw new JsonException("Failed to deserialize response");
+                return (TResponse)(await JsonSerializer.DeserializeAsync(contentStream, apiAction.ResponseType, SerializerOptions)
+                       ?? throw new JsonException("Failed to deserialize response"));
             }
 
             var error = await responseMessage.Content.ReadFromJsonAsync<FrejaOrgIdApiErrorResponse>()

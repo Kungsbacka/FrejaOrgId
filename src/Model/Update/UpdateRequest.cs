@@ -2,7 +2,7 @@
 
 namespace FrejaOrgId.Model.Update;
 
-public class UpdateRequest
+public class UpdateRequest : IUpdateRequest
 {
     public string Identifier { get; private set; }
 

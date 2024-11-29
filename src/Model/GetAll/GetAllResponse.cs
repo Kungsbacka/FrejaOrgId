@@ -2,7 +2,7 @@
 
 namespace FrejaOrgId.Model.GetAll;
 
-public class GetAllResponse
+public class GetAllResponse : IGetAllResponse
 {
     public UserInfo[] UserInfos { get; private set; }
 

@@ -5,7 +5,8 @@ internal static class Extensions
     public static string ThrowIfNullOrEmpty(this string value, string paramName)
     {
         if (value is null) throw new ArgumentNullException(paramName);
-        if (value == string.Empty) throw new ArgumentException("Value cannot be an empty string", paramName);
+        if (value == string.Empty) throw new ArgumentException("The value cannot be an empty string.", paramName);
+
         return value;
     }
 

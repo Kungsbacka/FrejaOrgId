@@ -1,6 +1,5 @@
 using System.Text.Json;
 using FrejaOrgId.Converters;
-using FrejaOrgId.Model;
 using FrejaOrgId.Model.GetOne;
 using FrejaOrgId.Model.Shared;
 

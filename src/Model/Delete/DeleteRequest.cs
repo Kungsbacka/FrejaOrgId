@@ -1,6 +1,6 @@
 ﻿namespace FrejaOrgId.Model.Delete;
 
-public class DeleteRequest
+public class DeleteRequest : IDeleteRequest
 {
     public string Identifier { get; private set; }
 

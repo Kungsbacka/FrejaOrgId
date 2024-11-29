@@ -1,6 +1,12 @@
-﻿namespace FrejaOrgId.Model.Delete;
+﻿using System.Text.Json.Serialization;
 
-public class DeleteResponse
+namespace FrejaOrgId.Model.Delete;
+
+public class DeleteResponse : IDeleteResponse
 {
-    internal DeleteResponse() { }
+    [JsonConstructor]
+    internal DeleteResponse()
+    {
+    
+    }
 }

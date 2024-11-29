@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace FrejaOrgId.Model.GetOne;
 
-public class GetOneResponse
+public class GetOneResponse : IGetOneResponse
 {
     public string OrgIdRef { get; private set; }
 

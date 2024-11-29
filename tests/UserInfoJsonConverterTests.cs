@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using FrejaOrgId.Model;
 using FrejaOrgId.Converters;
 using FrejaOrgId.Model.Shared;
 

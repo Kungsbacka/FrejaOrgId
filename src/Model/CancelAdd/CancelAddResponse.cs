@@ -1,6 +1,12 @@
-﻿namespace FrejaOrgId.Model.CancelAdd;
+﻿using System.Text.Json.Serialization;
 
-public record CancelAddResponse
+namespace FrejaOrgId.Model.CancelAdd;
+
+public class CancelAddResponse : ICancelAddResponse
 {
-    internal CancelAddResponse() { }
+    [JsonConstructor]
+    internal CancelAddResponse()
+    {
+
+    }
 }

@@ -61,25 +61,25 @@ namespace FrejaOrgId
             _jwtSigningKey = new RsaSecurityKey(jwtSigningCertificate.GetRSAPublicKey());
         }
 
-        public async Task<InitAddResponse> InitAddAsync(InitAddRequest request) =>
-            await SendRequestAsync<InitAddResponse, InitAddRequest>(request);
+        public async Task<IInitAddResponse> InitAddAsync(IInitAddRequest request) =>
+            await SendRequestAsync<IInitAddResponse, IInitAddRequest>(request);
 
-        public async Task<GetAllResponse> GetAllAsync(GetAllRequest request) =>
-            await SendRequestAsync<GetAllResponse, GetAllRequest>(request);
+        public async Task<IGetAllResponse> GetAllAsync(IGetAllRequest request) =>
+            await SendRequestAsync<IGetAllResponse, IGetAllRequest>(request);
 
-        public async Task<CancelAddResponse> CancelAddAsync(CancelAddRequest request) =>
-            await SendRequestAsync<CancelAddResponse, CancelAddRequest>(request);
+        public async Task<ICancelAddResponse> CancelAddAsync(ICancelAddRequest request) =>
+            await SendRequestAsync<ICancelAddResponse, ICancelAddRequest>(request);
 
-        public async Task<UpdateResponse> UpdateAsync(UpdateRequest request) =>
-            await SendRequestAsync<UpdateResponse, UpdateRequest>(request);
+        public async Task<IUpdateResponse> UpdateAsync(IUpdateRequest request) =>
+            await SendRequestAsync<IUpdateResponse, IUpdateRequest>(request);
 
-        public async Task<DeleteResponse> DeleteAsync(DeleteRequest request) =>
-            await SendRequestAsync<DeleteResponse, DeleteRequest>(request);
+        public async Task<IDeleteResponse> DeleteAsync(IDeleteRequest request) =>
+            await SendRequestAsync<IDeleteResponse, IDeleteRequest>(request);
 
-        public async Task<GetOneResponse> GetOneAsync(GetOneRequest request)
+        public async Task<IGetOneResponse> GetOneAsync(IGetOneRequest request)
         {
             IApiService apiService = _serviceProvider.GetRequiredService<IApiService>();
-            GetOneResponse response = await apiService.SendRequestAsync<GetOneResponse, GetOneRequest>(request);
+            IGetOneResponse response = await apiService.SendRequestAsync<IGetOneResponse, IGetOneRequest>(request);
             if (response.Status == TransactionStatus.Approved)
             {
                 ApprovedGetOneDetails? details = response.Details as ApprovedGetOneDetails;

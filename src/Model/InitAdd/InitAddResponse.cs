@@ -2,7 +2,7 @@
 
 namespace FrejaOrgId.Model.InitAdd;
 
-public class InitAddResponse
+public class InitAddResponse : IInitAddResponse
 {
     public string OrgIdRef { get; private set; }
 
