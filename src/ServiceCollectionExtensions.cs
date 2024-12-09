@@ -16,13 +16,11 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddFrejaOrgIdHttpClient(this IServiceCollection services, X509Certificate2 certificate, string? httpClientName)
+    public static IServiceCollection AddFrejaOrgIdHttpClient(this IServiceCollection services, X509Certificate2 certificate)
     {
         ArgumentNullException.ThrowIfNull(certificate);
 
-        httpClientName ??= FrejaOrgIdClientConfiguration.DefaultHttpClientName;
-
-        services.AddHttpClient(httpClientName)
+        services.AddHttpClient(FrejaOrgIdClientConfiguration.DefaultHttpClientName)
             .ConfigurePrimaryHttpMessageHandler(() =>
             {
                 var handler = new HttpClientHandler();
@@ -32,7 +30,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
-    public static IServiceCollection AddFrejaOrgIdHttpClient(this IServiceCollection services, X509Certificate2 certificate) =>
-        AddFrejaOrgIdHttpClient(services, certificate, null);
 }
