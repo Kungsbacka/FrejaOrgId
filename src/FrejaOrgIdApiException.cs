@@ -1,8 +1,8 @@
-﻿using FrejaOrgId.Model.Error;
+﻿using FrejaOrgId.Model.Response;
 
 namespace FrejaOrgId
 {
-    public class FrejaOrgIdApiException : Exception
+    public sealed class FrejaOrgIdApiException : Exception
     {
         public int Code { get; } = 9999;
 
@@ -14,7 +14,7 @@ namespace FrejaOrgId
         {
         }
 
-        public FrejaOrgIdApiException(FrejaOrgIdApiErrorResponse errorResponse) : base(errorResponse.Message)
+        public FrejaOrgIdApiException(ErrorResponse errorResponse) : base(errorResponse.Message)
         {
             Code = errorResponse.Code;
         }

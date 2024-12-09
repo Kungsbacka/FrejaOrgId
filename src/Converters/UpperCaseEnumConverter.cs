@@ -34,12 +34,37 @@ namespace FrejaOrgId.Converters
 
         /// <summary>
         /// Writes the specified value as a JSON string using the provided Utf8JsonWriter. This will also handle
-        /// the case where the value is an array of enums. Throws a JsonException if any enum value is null.
+        /// the case where the value is an array of enums. Throws a JsonException if any enum value is null or invalid.
         /// </summary>
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
-            string stringValue = value?.ToString() ?? throw new JsonException("Enum value cannot be null");
-            writer.WriteStringValue(stringValue.ToUpperInvariant());
+            if (value == null)
+            {
+                throw new JsonException("Enum value cannot be null");
+            }
+
+            if (value is Array enumArray)
+            {
+                writer.WriteStartArray();
+                foreach (var enumValue in enumArray)
+                {
+                    if (enumValue == null)
+                    {
+                        throw new JsonException("Enum array contains a null value");
+                    }
+
+                    string stringValue = enumValue.ToString()?.ToUpperInvariant()
+                        ?? throw new JsonException("Enum value cannot be null or invalid");
+                    writer.WriteStringValue(stringValue);
+                }
+                writer.WriteEndArray();
+            }
+            else
+            {
+                string stringValue = value.ToString()?.ToUpperInvariant()
+                    ?? throw new JsonException("Enum value cannot be null or invalid");
+                writer.WriteStringValue(stringValue);
+            }
         }
     }
 }

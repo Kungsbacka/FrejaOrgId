@@ -1,7 +1,6 @@
 using System.Text.Json;
 using FrejaOrgId.Converters;
-using FrejaOrgId.Model.GetOne;
-using FrejaOrgId.Model.Shared;
+using FrejaOrgId.Model;
 
 namespace FrejaOrgId.Tests;
 
@@ -87,7 +86,7 @@ public class GetOneDetailsConverterTests
                  certificateStatus: "Evidence of end-users certificate status"
               )
         );
-        value.SetOriginalJws("Original JWS");
+        value.OriginalJws = "Original JWS";
         
         var json = JsonSerializer.Serialize<GetOneDetailsBase>(value, _serializerOptions);
         

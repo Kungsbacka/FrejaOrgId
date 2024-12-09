@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using FrejaOrgId.Converters;
-using FrejaOrgId.Model.Shared;
+using FrejaOrgId.Model;
 
 namespace FrejaOrgId.Tests;
 

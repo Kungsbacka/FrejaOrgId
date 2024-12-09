@@ -10,6 +10,11 @@ public enum TestEnum
     ThirdValue
 }
 
+public class TestClassWithEnumArray
+{
+    public TestEnum[] EnumArray { get; set; } = [TestEnum.FirstValue, TestEnum.SecondValue, TestEnum.ThirdValue];
+}
+
 public class UpperCaseEnumConverterTests
 {
     private readonly JsonSerializerOptions _serializerOptions;
@@ -18,7 +23,8 @@ public class UpperCaseEnumConverterTests
     {
         _serializerOptions = new JsonSerializerOptions
         {
-            Converters = { new UpperCaseEnumConverter<TestEnum>() },
+            Converters = { new UpperCaseEnumConverter<TestEnum[]>() },
+
             PropertyNameCaseInsensitive = true
         };
     }
@@ -69,6 +75,17 @@ public class UpperCaseEnumConverterTests
         var json = JsonSerializer.Serialize(values, _serializerOptions);
 
         Assert.Equal("[\"FIRSTVALUE\",\"SECONDVALUE\",\"THIRDVALUE\"]", json);
+    }
+
+    [Fact]
+    public void Write_ShouldSerializeClassPropertyEnumArrayToUppercase()
+    {
+        var test = new TestClassWithEnumArray();
+
+
+        var json = JsonSerializer.Serialize(test, _serializerOptions);
+
+        Assert.Equal("{\"EnumArray\":[\"FIRSTVALUE\",\"SECONDVALUE\",\"THIRDVALUE\"]}", json);
     }
 
     [Fact]

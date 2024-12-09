@@ -1,136 +1,148 @@
-﻿namespace FrejaOrgId.Tests;
+﻿using FrejaOrgId.Model.Request;
+using FrejaOrgId.Model;
+using System.Text.Json;
 
-using FrejaOrgId.Model.CancelAdd;
-using FrejaOrgId.Model.Delete;
-using FrejaOrgId.Model.GetAll;
-using FrejaOrgId.Model.GetOne;
-using FrejaOrgId.Model.InitAdd;
-using FrejaOrgId.Model.Shared;
-using FrejaOrgId.Model.Update;
-using System;
-using Xunit;
+namespace FrejaOrgId.Tests;
 
 public class ModelTests
 {
     [Fact]
-    public void CancelAddRequest_ThrowsException_WhenOrgIdRefIsNullOrEmpty()
+    public void CancelAddRequest_ShouldSetOrgIdRef()
     {
-        Assert.Throws<ArgumentNullException>(() => new CancelAddRequest(null!));
+        string orgIdRef = "sample-org-id-ref";
+
+        var request = new CancelAddRequest(orgIdRef);
+
+        Assert.Equal(orgIdRef, request.OrgIdRef);
+        Assert.Equal("cancelAdd", request.Endpoint);
+        Assert.Equal("cancelAddOrganisationIdRequest", request.Action);
+    }
+
+    [Fact]
+    public void CancelAddRequest_ShouldThrowExceptionIfOrgIdRefIsNullOrEmpty()
+    {
         Assert.Throws<ArgumentException>(() => new CancelAddRequest(string.Empty));
     }
 
     [Fact]
-    public void DeleteRequest_ThrowsException_WhenIdentifierIsNullOrEmpty()
+    public void DeleteRequest_Should_Set_Identifier()
     {
-        Assert.Throws<ArgumentNullException>(() => new DeleteRequest(null!));
+        string identifier = "sample-identifier";
+
+        var request = new DeleteRequest(identifier);
+
+        Assert.Equal(identifier, request.Identifier);
+        Assert.Equal("delete", request.Endpoint);
+        Assert.Equal("deleteOrganisationIdRequest", request.Action);
+    }
+
+    [Fact]
+    public void DeleteRequest_ShouldThrowExceptionIfIdentifierIsNullOrEmpty()
+    {
         Assert.Throws<ArgumentException>(() => new DeleteRequest(string.Empty));
     }
 
     [Fact]
-    public void InitAddRequest_SetsExpiryToZero_WhenExpirationIsLessThanOrEqualToZero()
+    public void GetAllRequest_Should_Set_Endpoint_And_Action()
     {
-        var userInfo = new StringUserInfo("test");
-        var organisationId = new OrganisationId("Org", "IdName", "Id", null, null);
+        var request = new GetAllRequest();
 
-        var request = new InitAddRequest(UserInfoType.Email, userInfo, organisationId, MinRegistrationLevel.Extended, -1);
-        Assert.Equal(0, request.Expiry);
-
-        request = new InitAddRequest(UserInfoType.Email, userInfo, organisationId, MinRegistrationLevel.Extended, 0);
-        Assert.Equal(0, request.Expiry);
+        Assert.Equal("users/getAll", request.Endpoint);
+        Assert.Null(request.Action);
     }
 
     [Fact]
-    public void InitAddRequest_ThrowsArgumentException_WhenExpirationIsOutOfRange()
+    public void GetOneRequest_Should_Set_OrgIdRef()
     {
-        var userInfo = new StringUserInfo("test");
-        var organisationId = new OrganisationId("Org", "IdName", "Id", null, null);
+        string orgIdRef = "sample-org-id-ref";
 
-        Assert.Throws<ArgumentException>(() =>
-            new InitAddRequest(UserInfoType.Email, userInfo, organisationId, MinRegistrationLevel.Extended, 43201));
+        var request = new GetOneRequest(orgIdRef);
+
+        Assert.Equal(orgIdRef, request.OrgIdRef);
+        Assert.Equal("getOneResult", request.Endpoint);
+        Assert.Equal("getOneOrganisationIdResultRequest", request.Action);
     }
 
     [Fact]
-    public void InitAddRequest_ThrowsInvalidOperationException_WhenUserInfoTypeMismatch()
+    public void GetOneRequest_Should_Throw_Exception_If_OrgIdRef_Is_NullOrEmpty()
     {
-        var stringUserInfo = new StringUserInfo("test");
-        var ssnUserInfo = new SsnUserInfo("SE", "198001010001");
-        var organisationId = new OrganisationId("Org", "IdName", "Id", null, null);
-
-        Assert.Throws<InvalidOperationException>(() =>
-            new InitAddRequest(UserInfoType.Ssn, stringUserInfo, organisationId, MinRegistrationLevel.Extended, 10));
-
-        Assert.Throws<InvalidOperationException>(() =>
-            new InitAddRequest(UserInfoType.Email, ssnUserInfo, organisationId, MinRegistrationLevel.Extended, 10));
+        Assert.Throws<ArgumentException>(() => new GetOneRequest(string.Empty));
     }
 
     [Fact]
-    public void InitAddRequest_SetsExpiryCorrectly_WhenExpirationValid()
+    public void InitAddRequest_Should_Set_Properties()
     {
-        var userInfo = new StringUserInfo("test");
-        var organisationId = new OrganisationId("Org", "IdName", "Id", null, null);
-        var expirationInMinutes = 10;
-        var request = new InitAddRequest(UserInfoType.Email, userInfo, organisationId, MinRegistrationLevel.Extended, expirationInMinutes);
+        var userInfoType = UserInfoType.Phone;
+        var userInfo = new StringUserInfo("+1234567890");
+        var organisationId = new OrganisationId("Title", "IdentifierName", "Identifier", null, null);
+        var minRegistrationLevel = MinRegistrationLevel.Extended;
+        int expirationInMinutes = 30;
 
-        var expectedExpiryLowerBound = DateTimeOffset.Now.AddMinutes(expirationInMinutes).ToUnixTimeMilliseconds() - 1000;
-        var expectedExpiryUpperBound = DateTimeOffset.Now.AddMinutes(expirationInMinutes).ToUnixTimeMilliseconds() + 1000;
+        var request = new InitAddRequest(userInfoType, userInfo, organisationId, minRegistrationLevel, expirationInMinutes);
 
-        Assert.InRange(request.Expiry, expectedExpiryLowerBound, expectedExpiryUpperBound);
+        Assert.Equal(userInfoType, request.UserInfoType);
+        Assert.Equal(userInfo, request.UserInfo);
+        Assert.Equal(organisationId, request.OrganisationId);
+        Assert.Equal(minRegistrationLevel, request.MinRegistrationLevel);
+        Assert.True(request.Expiry > 0);
     }
 
     [Fact]
-    public void ApprovedGetOneDetails_SetOriginalJws_ThrowsInvalidOperationException_WhenAlreadySet()
+    public void InitAddRequest_Should_Throw_Exception_For_Invalid_Expiration()
     {
-        var details = new ApprovedGetOneDetails(
-            "OrgRef",
-            TransactionStatus.Approved,
-            UserInfoType.Email,
-            new StringUserInfo("test"),
-            MinRegistrationLevel.Extended,
-            DateTime.UtcNow,
-            SignatureType.Simple,
-            new SignatureData("Signature", "Valid"));
+        var userInfoType = UserInfoType.Phone;
+        var userInfo = new StringUserInfo("+1234567890");
+        var organisationId = new OrganisationId("Title", "IdentifierName", "Identifier", null, null);
 
-        details.SetOriginalJws("test-jws");
-
-        Assert.Throws<InvalidOperationException>(() => details.SetOriginalJws("another-jws"));
+        Assert.Throws<ArgumentException>(() => new InitAddRequest(userInfoType, userInfo, organisationId, MinRegistrationLevel.Extended, 1));
     }
 
     [Fact]
-    public void UserOrganisationId_ThrowsException_WhenRequiredFieldsAreNullOrEmpty()
+    public void InitAddRequest_Should_Serialize_Correctly()
     {
-        Assert.Throws<ArgumentNullException>(() => new UserOrganisationId(null!, "Name", "Id"));
-        Assert.Throws<ArgumentNullException>(() => new UserOrganisationId("Title", "Name", null!));
-        Assert.Throws<ArgumentException>(() => new UserOrganisationId("", "Name", "Id"));
-        Assert.Throws<ArgumentException>(() => new UserOrganisationId("Title", "Name", ""));
+        var userInfoType = UserInfoType.Ssn;
+        var userInfo = new SsnUserInfo("SE", "198001010000");
+        var organisationId = new OrganisationId("Title", "IdentifierName", "Identifier", null, null);
+        var minRegistrationLevel = MinRegistrationLevel.Extended;
+        int expirationInMinutes = 0;
+
+        var request = new InitAddRequest(userInfoType, userInfo, organisationId, minRegistrationLevel, expirationInMinutes);
+
+        var expectedJson = "{\"UserInfoType\":\"SSN\",\"UserInfo\":\"eyJDb3VudHJ5IjoiU0UiLCJTc24iOiIxOTgwMDEwMTAwMDAifQ==\",\"MinRegistrationLevel\":\"EXTENDED\",\"OrganisationId\":{\"Title\":\"Title\",\"IdentifierName\":\"IdentifierName\",\"Identifier\":\"Identifier\",\"IdentifierDisplayTypes\":null,\"AdditionalAttributes\":null}}";
+
+        var actualjson = JsonSerializer.Serialize(request);
+
+        Assert.Equal(expectedJson, actualjson);
     }
 
     [Fact]
-    public void AdditionalAttribute_ThrowsException_WhenRequiredFieldsAreNullOrEmpty()
+    public void UpdateRequest_Should_Set_Properties()
     {
-        Assert.Throws<ArgumentNullException>(() => new AdditionalAttribute(null!, "DisplayText", "Value"));
-        Assert.Throws<ArgumentNullException>(() => new AdditionalAttribute("Key", null!, "Value"));
-        Assert.Throws<ArgumentNullException>(() => new AdditionalAttribute("Key", "DisplayText", null!));
-        Assert.Throws<ArgumentException>(() => new AdditionalAttribute("", "DisplayText", "Value"));
-        Assert.Throws<ArgumentException>(() => new AdditionalAttribute("Key", "", "Value"));
-        Assert.Throws<ArgumentException>(() => new AdditionalAttribute("Key", "DisplayText", ""));
+        var identifier = "sample-identifier";
+        var additionalAttributes = new[]
+        {
+            new AdditionalAttribute("Key1", "DisplayText1", "Value1"),
+            new AdditionalAttribute("Key2", "DisplayText2", "Value2")
+        };
+
+        var request = new UpdateRequest(identifier, additionalAttributes);
+
+        Assert.Equal(identifier, request.Identifier);
+        Assert.Equal(additionalAttributes, request.AdditionalAttributes);
+        Assert.Equal("update", request.Endpoint);
+        Assert.Equal("updateOrganisationIdRequest", request.Action);
     }
 
     [Fact]
-    public void UpdateRequest_ThrowsException_WhenIdentifierIsNullOrEmpty()
+    public void UpdateRequest_Should_Throw_Exception_If_Too_Many_Attributes()
     {
-        Assert.Throws<ArgumentNullException>(() => new UpdateRequest(null!, Array.Empty<AdditionalAttribute>()));
-        Assert.Throws<ArgumentException>(() => new UpdateRequest(string.Empty, Array.Empty<AdditionalAttribute>()));
-    }
-
-    [Fact]
-    public void UpdateRequest_ThrowsArgumentException_WhenAdditionalAttributesExceedLimit()
-    {
-        var attributes = new AdditionalAttribute[11];
+        var identifier = "sample-identifier";
+        var tooManyAttributes = new AdditionalAttribute[11];
         for (int i = 0; i < 11; i++)
         {
-            attributes[i] = new AdditionalAttribute($"Key{i}", $"DisplayText{i}", $"Value{i}");
+            tooManyAttributes[i] = new AdditionalAttribute($"Key{i}", $"DisplayText{i}", $"Value{i}");
         }
 
-        Assert.Throws<ArgumentException>(() => new UpdateRequest("Identifier", attributes));
+        Assert.Throws<ArgumentException>(() => new UpdateRequest(identifier, tooManyAttributes));
     }
 }

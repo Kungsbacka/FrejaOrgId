@@ -1,4 +1,4 @@
-﻿using FrejaOrgId.Model.GetOne;
+﻿using FrejaOrgId.Model;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Buffers.Text;
 using System.Text;
@@ -50,7 +50,7 @@ namespace FrejaOrgId.Converters
             if (TokenHandler.CanReadToken(value))
             {
                 ApprovedGetOneDetails details = DeserializeJws(value, options);
-                details.SetOriginalJws(value);
+                details.OriginalJws = value;
                 return details;
             }
 
