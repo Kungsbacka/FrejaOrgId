@@ -6,7 +6,7 @@ C# library for Freja Organisation eID API. Can be used to send requests to the A
 
 ### With a HttpClient created by the library
 
-AuthCertificate is the certificate used to authenticate to The Freja Organisation eID API. jwtSigningCertificate is the certificate Freja uses to sign the JWT to create a JWS. When a InitAddReq is fetched from the API, the library will use this certificate to check the JWS signature if you not explicitly disable JWS signature check.
+AuthCertificate is the certificate used to authenticate to the Freja Organisation eID API. jwtSigningCertificate is the certificate Freja uses to sign a JWS. When an Organisation ID Result is fetched from the API (with getOneResult), the library will use this certificate to check the JWS signature in the result, if you not explicitly disable JWS signature check.
 
 ```C#
 # Fetch certificates from secure storage. 
