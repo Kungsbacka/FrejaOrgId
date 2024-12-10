@@ -106,15 +106,19 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
         }
     }
 
-    private StringContent BuildBase64EncodedStringContent<TRequest, TResponse>(TRequest request)
+    private StringContent? BuildBase64EncodedStringContent<TRequest, TResponse>(TRequest request)
         where TRequest : FrejaApiRequest<TResponse>
         where TResponse : FrejaApiResponse
     {
+        if (request.Action == null)
+        {
+            return null;
+        }
+
         StringBuilder sb = new(request.Action);
         sb.Append('=');
         Span<byte> bytes = JsonSerializer.SerializeToUtf8Bytes(request, request.GetType(), _serializerOptions);
         sb.Append(Convert.ToBase64String(bytes));
-        Base64.EncodeToUtf8InPlace(bytes, bytes.Length, out int bytesWritten);
         return new StringContent(sb.ToString());
     }
 }
