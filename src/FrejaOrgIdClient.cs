@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 using System.Text;
 using System.Net.Http.Json;
-using System.Buffers.Text;
 
 namespace FrejaOrgId;
 
