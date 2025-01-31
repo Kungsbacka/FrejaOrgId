@@ -11,12 +11,11 @@ public class GetOneResponse : FrejaApiResponse
     public TransactionStatus Status { get; private set; }
 
     [JsonConverter(typeof(GetOneDetailsConverter))]
-    public GetOneDetailsBase Details { get; private set; }
+    public GetOneDetailsBase? Details { get; private set; }
 
-    public GetOneResponse(string orgIdRef, TransactionStatus status, GetOneDetailsBase details)
+    public GetOneResponse(string orgIdRef, TransactionStatus status, GetOneDetailsBase? details)
     {
         ArgumentException.ThrowIfNullOrEmpty(orgIdRef);
-        ArgumentNullException.ThrowIfNull(details);
 
         OrgIdRef = orgIdRef;
         Status = status;
