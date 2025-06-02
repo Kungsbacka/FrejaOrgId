@@ -55,7 +55,7 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
     }
 
     public async Task<TResponse> SendRequestAsync<TResponse>(FrejaApiRequest<TResponse> request)
-    where TResponse : FrejaApiResponse
+        where TResponse : FrejaApiResponse
     {
         return await SendRequestAsync<FrejaApiRequest<TResponse>, TResponse>(request);
     }
