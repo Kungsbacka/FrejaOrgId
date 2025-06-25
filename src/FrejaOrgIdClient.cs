@@ -28,18 +28,18 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
         };
     }
 
-    public async Task<TResponse> SendRequestAsync<TRequest, TResponse>(TRequest request)
+    public async Task<TResponse> SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken ct = default)
         where TRequest : FrejaApiRequest<TResponse>
         where TResponse : FrejaApiResponse
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
         using var content = BuildBase64EncodedStringContent<TRequest, TResponse>(request);
-        using var responseMessage = await GetHttpClient().PostAsync(request.Endpoint, content);
-        await using var contentStream = await responseMessage.Content.ReadAsStreamAsync();
+        using var responseMessage = await GetHttpClient().PostAsync(request.Endpoint, content, ct);
+        await using var contentStream = await responseMessage.Content.ReadAsStreamAsync(ct);
         if (responseMessage.IsSuccessStatusCode)
         {
-            var response = await JsonSerializer.DeserializeAsync<TResponse>(contentStream, _serializerOptions)
+            var response = await JsonSerializer.DeserializeAsync<TResponse>(contentStream, _serializerOptions, ct)
                 ?? throw new JsonException("Failed to deserialize response");
 
             if (response is GetOneResponse getOneResponse)
@@ -54,10 +54,10 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
         throw new FrejaOrgIdApiException(error);
     }
 
-    public async Task<TResponse> SendRequestAsync<TResponse>(FrejaApiRequest<TResponse> request)
+    public async Task<TResponse> SendRequestAsync<TResponse>(FrejaApiRequest<TResponse> request, CancellationToken ct = default)
         where TResponse : FrejaApiResponse
     {
-        return await SendRequestAsync<FrejaApiRequest<TResponse>, TResponse>(request);
+        return await SendRequestAsync<FrejaApiRequest<TResponse>, TResponse>(request, ct);
     }
 
     private async Task ValidateGetOneResponseAsync(GetOneResponse response)
