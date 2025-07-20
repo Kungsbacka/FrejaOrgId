@@ -1,15 +1,17 @@
 # Freja Organisation eID library
 
-C# library for Freja Organisation eID API. Can be used to send requests to the API and handle request/response serialization/deserialization.
+C# library for the Freja eID [Organisation ID service][]. Can be used to send requests to the service and handle request/response serialization/deserialization.
+
+[Organisation ID service]: https://frejaeid.atlassian.net/wiki/spaces/DOC/pages/2162756/Organisation+ID+Service
 
 ## Example usage
 
-### With a HttpClient created by the library
+### With an HttpClient created by the library
 
-AuthCertificate is the certificate used to authenticate to the Freja Organisation eID API. jwtSigningCertificate is the certificate Freja uses to sign a JWS. When an Organisation ID Result is fetched from the API (with getOneResult), the library will use this certificate to check the JWS signature in the result, if you not explicitly disable JWS signature check.
+AuthCertificate is the certificate used to authenticate to the Freja eID Organisation ID service. jwtSigningCertificate is the certificate the serivce uses to sign a JWS. When an Organisation ID Result is fetched from the service (with getOneResult), the library will use this certificate to validate the JWS signature from the result, if you do not explicitly disable the JWS signature validation.
 
-```C#
-# Fetch certificates from secure storage. 
+```csharp
+// Fetch authCertificate and jwtSigningCertificate, and then do
 builder.Services.AddFrejaOrgIdHttpClient(authCertificate);
 builder.Services.AddFrejaOrgIdClient(config =>
 {
@@ -20,7 +22,7 @@ builder.Services.AddFrejaOrgIdClient(config =>
 
 ### With JWS signature validation disabled
 
-```C#
+```csharp
 builder.Services.AddFrejaOrgIdHttpClient(authCertificate);
 builder.Services.AddFrejaOrgIdClient(config =>
 {
@@ -31,7 +33,7 @@ builder.Services.AddFrejaOrgIdClient(config =>
 
 ### With your own HttpClient
 
-```C#
+```csharp
 builder.Services.AddFrejaOrgIdClient(config =>
 {
     config.Environment = FrejaEnvironment.Production;
