@@ -1,4 +1,4 @@
-# Freja Organisation eID library
+# Freja eID Organisation ID service library
 
 C# library for the Freja eID [Organisation ID service][]. Can be used to send requests to the service and handle request/response serialization/deserialization.
 
