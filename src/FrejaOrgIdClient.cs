@@ -49,7 +49,7 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
             return response;
         }
 
-        var error = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>()
+        var error = await responseMessage.Content.ReadFromJsonAsync<ErrorResponse>(ct)
             ?? throw new FrejaOrgIdApiException();
         throw new FrejaOrgIdApiException(error);
     }
