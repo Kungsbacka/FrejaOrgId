@@ -23,7 +23,7 @@ public class UpperCaseEnumConverterTests
     {
         _serializerOptions = new JsonSerializerOptions
         {
-            Converters = { new UpperCaseEnumConverter<TestEnum[]>() },
+            Converters = { new UpperCaseEnumConverter<TestEnum>() },
 
             PropertyNameCaseInsensitive = true
         };
