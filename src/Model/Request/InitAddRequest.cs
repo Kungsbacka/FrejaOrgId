@@ -70,10 +70,6 @@ public class InitAddRequest : FrejaApiRequest<InitAddResponse>
 
                     break;
                 }
-            case UserInfoType.Inferred:
-                throw new ArgumentException(
-                    "If UserInfoType is 'Inferred' UserInfo value must be of type StringUserInfo",
-                    nameof(userInfo));
             default:
                 {
                     if (userInfo is not StringUserInfo)
