@@ -18,6 +18,7 @@ public sealed class FrejaOrgIdClientConfiguration
 
     public void CopyJwtSigningKey(X509Certificate2 certificate)
     {
-        JwtSigningKey = new RsaSecurityKey(certificate.GetRSAPublicKey());
+        using var rsa = certificate.GetRSAPublicKey();
+        JwtSigningKey = new RsaSecurityKey(rsa!.ExportParameters(includePrivateParameters: false));
     }
 }

@@ -11,6 +11,12 @@ public static class ServiceCollectionExtensions
         configure(configuration);
         services.AddSingleton(configuration);
 
+        var baseAddress = configuration.Environment == FrejaEnvironment.Test
+            ? FrejaOrgIdClientConfiguration.TestEnvironmentBaseAddress
+            : FrejaOrgIdClientConfiguration.ProductionEnvironmentBaseAddress;
+        services.AddHttpClient(configuration.HttpClientName)
+            .ConfigureHttpClient(client => client.BaseAddress = baseAddress);
+
         services.AddScoped<IFrejaOrgIdClient, FrejaOrgIdClient>();
 
         return services;

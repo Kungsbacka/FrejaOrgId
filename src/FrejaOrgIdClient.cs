@@ -11,6 +11,8 @@ namespace FrejaOrgId;
 
 public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
 {
+    private static readonly JsonWebTokenHandler _tokenHandler = new();
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly JsonSerializerOptions _serializerOptions;
     private readonly FrejaOrgIdClientConfiguration _configuration;
@@ -36,9 +38,9 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
 
         using var content = BuildBase64EncodedStringContent<TRequest, TResponse>(request);
         using var responseMessage = await GetHttpClient().PostAsync(request.Endpoint, content, ct);
-        await using var contentStream = await responseMessage.Content.ReadAsStreamAsync(ct);
         if (responseMessage.IsSuccessStatusCode)
         {
+            await using var contentStream = await responseMessage.Content.ReadAsStreamAsync(ct);
             var response = await JsonSerializer.DeserializeAsync<TResponse>(contentStream, _serializerOptions, ct)
                 ?? throw new JsonException("Failed to deserialize response");
 
@@ -67,7 +69,7 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
             ApprovedGetOneDetails? details = response.Details as ApprovedGetOneDetails;
             if (details?.OriginalJws == null)
             {
-                throw new Exception("OriginalJws should not be null.");
+                throw new InvalidOperationException("OriginalJws should not be null.");
             }
             if (!_configuration.DisableJwtSignatureValidation && _configuration.JwtSigningKey != null)
             {
@@ -78,16 +80,11 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
 
     private HttpClient GetHttpClient()
     {
-        var httpClient = _httpClientFactory.CreateClient(_configuration.HttpClientName);
-        httpClient.BaseAddress = _configuration.Environment == FrejaEnvironment.Test
-            ? FrejaOrgIdClientConfiguration.TestEnvironmentBaseAddress
-            : FrejaOrgIdClientConfiguration.ProductionEnvironmentBaseAddress;
-        return httpClient;
+        return _httpClientFactory.CreateClient(_configuration.HttpClientName);
     }
 
     private async Task ThrowIfInvalidJwsSignatureAsync(string jwt)
     {
-        var tokenHandler = new JsonWebTokenHandler();
         var validationParameters = new TokenValidationParameters()
         {
             IssuerSigningKey = _configuration.JwtSigningKey,
@@ -95,10 +92,10 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
             ValidateAudience = false,
             ValidateIssuer = false,
         };
-        TokenValidationResult validationResult = await tokenHandler.ValidateTokenAsync(jwt, validationParameters);
+        TokenValidationResult validationResult = await _tokenHandler.ValidateTokenAsync(jwt, validationParameters);
         if (!validationResult.IsValid)
         {
-            throw new Exception("JWS signature is invalid")
+            throw new SecurityTokenInvalidSignatureException()
             {
                 Data = { ["TokenValidationResult"] = validationResult }
             };
