@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- Suppress warnings about the entry point not being used -->
+        <NoWarn>$(NoWarn);CS7022</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\src\FrejaOrgId.csproj" />
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.34.1" PrivateAssets="all" IncludeAssets="build" />
+    </ItemGroup>
+
+    <Target Name="BundleForPowerShell" AfterTargets="Build">
+        <PropertyGroup>
+            <DistDir>$(MSBuildProjectDirectory)\..\dist\</DistDir>
+        </PropertyGroup>
+
+        <MakeDir Directories="$(DistDir)" />
+
+        <!-- Merge IdentityModel into FrejaOrgId.dll — these are internal JWT implementation details -->
+        <ItemGroup>
+            <MergeAssemblies Include="$(OutputPath)Microsoft.IdentityModel.Abstractions.dll" />
+            <MergeAssemblies Include="$(OutputPath)Microsoft.IdentityModel.JsonWebTokens.dll" />
+            <MergeAssemblies Include="$(OutputPath)Microsoft.IdentityModel.Logging.dll" />
+            <MergeAssemblies Include="$(OutputPath)Microsoft.IdentityModel.Tokens.dll" />
+        </ItemGroup>
+
+        <ILRepack
+            OutputFile="$(DistDir)FrejaOrgId.dll"
+            InputAssemblies="$(OutputPath)FrejaOrgId.dll;@(MergeAssemblies)"
+            Internalize="true"
+            TargetKind="Dll"
+            XmlDocumentation="false" />
+
+        <!-- Copy remaining dependency DLLs — PowerShell scripts reference these types directly -->
+        <ItemGroup>
+            <CopyAssemblies Include="$(OutputPath)*.dll"
+                Exclude="$(OutputPath)FrejaOrgId.dll;$(OutputPath)Bundle.dll;@(MergeAssemblies)" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(CopyAssemblies)" DestinationFolder="$(DistDir)" />
+
+        <Message Text="Bundled output written to $(DistDir)FrejaOrgId.dll" Importance="high" />
+    </Target>
+
+</Project>

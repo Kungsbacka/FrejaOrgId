@@ -80,7 +80,11 @@ public sealed class FrejaOrgIdClient : IFrejaOrgIdClient
 
     private HttpClient GetHttpClient()
     {
-        return _httpClientFactory.CreateClient(_configuration.HttpClientName);
+        var httpClient = _httpClientFactory.CreateClient(_configuration.HttpClientName);
+        httpClient.BaseAddress ??= _configuration.Environment == FrejaEnvironment.Test
+            ? FrejaOrgIdClientConfiguration.TestEnvironmentBaseAddress
+            : FrejaOrgIdClientConfiguration.ProductionEnvironmentBaseAddress;
+        return httpClient;
     }
 
     private async Task ThrowIfInvalidJwsSignatureAsync(string jwt)
